@@ -9,7 +9,7 @@ def on_button_click():
 
 
 app = tk.Tk()
-app.geometry("300x200")
+app.geometry("700x700")
 app.title("Ejemplo con Tkinter")
 
 label = tk.Label(app, text="Presiona el botón:")

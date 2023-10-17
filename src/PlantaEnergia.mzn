@@ -1,16 +1,16 @@
 int: num_clientes;
 int: num_dias;
 int: plantas;
-array[1..num_clientes, 1..num_dias] of float: demanda;
-
-int: G;
+float: G;
 
 array[1..num_clientes] of float: pagoCliente;
 array[1..plantas] of float: costo;
 array[1..plantas] of float: capacidad;
+array[1..num_clientes, 1..num_dias] of float: demanda;
+
 
 % Variables de decisión
-array[1..num_clientes, 1..num_dias, 1..plantas] of var int: produccion;  % Producción de energía por planta
+array[1..num_clientes, 1..num_dias, 1..plantas] of var float: produccion;  % Producción de energía por planta
     
 constraint forall(d in 1..num_dias, p in 1..plantas) (
     sum(c in 1..num_clientes) (produccion[c,d,p]) <= capacidad[p]
