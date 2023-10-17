@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "project-co"
+version = "0.1.0"
+description = "Project for the complexity and optimization course"
+authors = ["Chris Sanchez <christian.valenzuela@correounivalle.edu.co>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+tk = "^0.1.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
