@@ -1,3 +1,5 @@
+% Porcentaje mínimo de demanda a satisfacer
+G = 50;
 % costo por MW producido en cada planta
 costo=[50.0, 20.0, 10.0];
 % Capacidad diaria de las centrales (en MW)
