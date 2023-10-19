@@ -4,6 +4,16 @@ model_path = 'src/PlantaEnergia.mzn'
 data_path = 'src/Datos.dzn'
 
 
+def validate_int_input(P):
+    if P == "":
+        return True
+    try:
+        int(P)
+        return True
+    except ValueError:
+        return False
+
+
 def write_data(G, num_clientes, num_dias, costo, capacidad, pagoCliente, nueva_demanda, file_name=data_path):
     with open(file_name, 'w') as file:
         file.write("% Porcentaje mínimo de demanda a satisfacer\n")
