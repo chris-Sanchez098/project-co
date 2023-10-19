@@ -1,8 +1,11 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import Entry
 from tkinter import Scrollbar
 from tkinter.font import Font
 from tkinter import Label
+from tkinter import Button
+from tkinter import END
+from tkinter import RIDGE
 from utils import *
 
 
@@ -15,6 +18,48 @@ matriz = []
 
 def set_container_color(container, color):
     container.configure(bg=color)
+
+
+def init_tb_payments(num_clients: int):
+    columnas = []
+    for i in range(2):
+        filas = []
+        for j in range(num_clients):
+            text = f'Cliente {j+1}' if i == 0 else ""
+            e = Entry(container4, text=text)
+            e_window = container4.create_window(
+                (4+i*160, 20+j*20), window=e, anchor="nw")
+            filas.append(e)
+        columnas.append(filas)
+    matriz.append(columnas)
+
+
+def clickStart():
+    global num_clients
+    try:
+        lb_clients_c4 = tk.Label(
+            container4, text="Clientes", font=('Times New Roman', 12))
+        lb_pago_c4 = tk.Label(container4, text="Pago",
+                              font=('Times New Roman', 12))
+
+        lb_clients_c4_window = container4.create_window(
+            (50, 0), window=lb_clients_c4, anchor="nw")
+
+        lb_pago_c4_window = container4.create_window(
+            (200, 0), window=lb_pago_c4, anchor="nw")
+        num_clients = int(input_clients.get(), 10)
+        # Agregar entradas a container4
+        init_tb_payments(num_clients)
+    except IndexError:
+        pass  # Manejo de excepción
+
+
+def on_horizontal_scroll(event):
+    container = event.widget
+    if event.delta > 0:
+        container.xview_scroll(-1, "units")
+    else:
+        container.xview_scroll(1, "units")
 
 
 root = tk.Tk()
@@ -40,6 +85,7 @@ container4.config(yscrollcommand=scrollbar4_y.set,
                   xscrollcommand=scrollbar4_x.set)
 scrollbar4_y.config(command=container4.yview)
 scrollbar4_x.config(command=container4.xview)
+container4.bind("<MouseWheel>", on_horizontal_scroll)
 
 container5 = tk.Canvas(root)
 scrollbar5_y = Scrollbar(container5, orient="vertical")
@@ -74,7 +120,6 @@ scrollbar6_y.pack(side="right", fill="y")
 scrollbar6_x.pack(side="bottom", fill="x")
 
 # Set containers colors / temp
-set_container_color(container4, "lightgreen")
 set_container_color(container5, "green")
 set_container_color(container6, "lightcoral")
 
@@ -92,24 +137,26 @@ lb_clients.place(x=20, y=10)
 lb_days = Label(container2, text="Ingrese el número de días =>")
 lb_days.place(x=20, y=30)
 
-input_clients = ttk.Entry(container2, width=10)
+input_clients = Entry(container2, width=10)
 input_clients.place(x=230, y=10)
 input_clients.configure(validate="key", validatecommand=(
     input_clients.register(validate_int_input), "%P"))
 
-input_days = ttk.Entry(container2, width=10)
+input_days = Entry(container2, width=10)
 input_days.place(x=230, y=30)
 input_days.configure(validate="key", validatecommand=(
     input_days.register(validate_int_input), "%P"))
+
+boton_cargar = Button(
+    container2, text="Iniciar carga de datos", command=clickStart, width=25)
+boton_cargar.place(x=50, y=60)
 
 # container3
 content3 = tk.Label(container3, text="Contenedor 3")
 content3.pack()
 
+
 # Add content to containers 4, 5 and 6 using canvas
-content4 = tk.Label(container4, text="Contenedor 4")
-content4_window = container4.create_window(
-    (0, 0), window=content4, anchor="nw")
 content5 = tk.Label(container5, text="Contenedor 5")
 content5_window = container5.create_window(
     (0, 0), window=content5, anchor="nw")
