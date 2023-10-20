@@ -6,7 +6,9 @@ from tkinter import Label
 from tkinter import Button
 from tkinter import END
 from tkinter import RIDGE
+from tkinter import Toplevel
 from utils import *
+from utils import write_data
 
 # Global variables
 num_days = 0
@@ -148,28 +150,42 @@ def clickSolve():
     demanda_values = []
     pago_values = []
 
-    for i in range(1, len(demanda[0])):
-        lista = demanda[0][i]
-        temp = []
-        for j in range(len(lista)):
-            temp.append(int(lista[j].get(), 10))
-        demanda_values.append(temp)
+    try:
+        for i in range(1, len(demanda[0])):
+            lista = demanda[0][i]
+            temp = []
+            for j in range(len(lista)):
+                temp.append(int(lista[j].get(), 10))
+            demanda_values.append(temp)
 
-    for i in range(len(pago[0][1])):
-        value = pago[0][1][i].get()
-        pago_values.append(int(value, 10))
+        demanda_values = [list(x) for x in zip(*demanda_values)]
 
-    for i in range(len(capacidad[0])):
-        value = capacidad[0][i][0].get()
-        capacidad_values.append(int(value, 10))
-        value = capacidad[0][i][1].get()
-        costo_values.append(int(value, 10))
+        for i in range(len(pago[0][1])):
+            value = pago[0][1][i].get()
+            pago_values.append(int(value, 10))
 
-    print("pago:", pago_values)
-    print("capacidad:", capacidad_values)
-    print("costo:", costo_values)
-    print("demanda:", demanda_values)
-    print("demanda:", demanda_values)
+        for i in range(len(capacidad[0])):
+            value = capacidad[0][i][0].get()
+            capacidad_values.append(int(value, 10))
+            value = capacidad[0][i][1].get()
+            costo_values.append(int(value, 10))
+
+        print("pago:", pago_values)
+        print("capacidad:", capacidad_values)
+        print("costo:", costo_values)
+        print("demanda:", demanda_values)
+
+        print(solve(g, num_clients, num_days, costo_values,
+              capacidad_values, pago_values, demanda_values))
+
+    except ValueError:
+        t = Toplevel(root)
+        t.wm_title("Error")
+        t.geometry("480x40")
+        t.resizable(False, False)
+        label_t = Label(t, text="Complete los datos o inserte datos validos", font=(
+            'Times New Roman', 20), fg="red")
+        label_t.place(relx=0, y=0)
 
     # solve(g, num_clients, num_days, costo, capacidad,
     #       pago, demanda)

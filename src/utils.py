@@ -31,9 +31,9 @@ def write_data(G, num_clientes, num_dias, costo, capacidad, pagoCliente, nueva_d
         file.write("% Pago por MW de cada cliente\n")
         file.write(f"pagoCliente={pagoCliente};\n")
         file.write("% Demanda\n")
-        file.write("demanda=[\n")
+        file.write("demanda=[")
         for fila in nueva_demanda:
-            file.write("         |")
+            file.write("|")
             file.write(", ".join(map(str, fila)))
             file.write("\n")
         file.write("        |];\n")
@@ -46,9 +46,9 @@ nueva_demanda = [
     [910.0, 12110.0, 2112.0],
     [300.0, 11210.0, 2010.0]
 ]
-G = 5100.0
-num_clientes = 410.0
-num_dias = 130.0
+G = 5
+num_clientes = 4
+num_dias = 3
 costo = [5010.0, 2001.0, 1100.0]
 capacidad = [10100.0, 30110.0, 11500.0]
 pagoCliente = [11100.0, 11110.0, 9115.0, 1111.0]
@@ -63,3 +63,9 @@ def solve(G, num_clientes, num_dias, costo, capacidad, pagoCliente, nueva_demand
     result = os.popen(
         f'minizinc --solver COIN-BC {model_path} {data_path}').read()
     return result
+
+
+# write_data(G, num_clientes, num_dias,
+#            costo, capacidad, pagoCliente, nueva_demanda)
+# print(solve(G, num_clientes, num_dias, costo, capacidad,
+#       pagoCliente, nueva_demanda, data_path))

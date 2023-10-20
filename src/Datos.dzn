@@ -1,19 +1,18 @@
-% Número de clientes
-num_clientes = 4;
-% Número de días
-num_dias = 3;
-% número de plantas
-plantas = 3;
 % Porcentaje mínimo de demanda a satisfacer
-G = 50.0;
-% Pago por MW de cada cliente
-pagoCliente=[11.0, 11.0, 91.0, 11.0];
+G = 2;
 % costo por MW producido en cada planta
-costo=[5010.0, 2001.0, 1100.0];
+costo=[10, 10, 10];
 % Capacidad diaria de las centrales (en MW)
-capacidad=[10100.0, 30110.0, 11500.0];
+capacidad=[100, 100, 100];
+% Número de clientes
+num_clientes=2;
+% Número de días
+num_dias=2;
+% número de plantas
+plantas=3;
+% Pago por MW de cada cliente
+pagoCliente=[20, 20];
 % Demanda
-demanda=[| 80.0, 110.0, 90.0 
-         | 150.0, 98.0, 340.0 
-         | 90.0, 20.0, 212.0 
-         | 300.0, 210.0, 200.0 |]; 
+demanda=[|10, 10
+|10, 10
+        |];
