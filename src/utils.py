@@ -57,10 +57,9 @@ pagoCliente = [11100.0, 11110.0, 9115.0, 1111.0]
 #            costo, capacidad, pagoCliente, nueva_demanda)
 
 
-def solve():
+def solve(G, num_clientes, num_dias, costo, capacidad, pagoCliente, nueva_demanda, file_name=data_path):
+    write_data(G, num_clientes, num_dias, costo, capacidad,
+               pagoCliente, nueva_demanda, file_name)
     result = os.popen(
         f'minizinc --solver COIN-BC {model_path} {data_path}').read()
     return result
-
-
-print(solve())
