@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 from tkinter import Entry
 from tkinter import Scrollbar
 from tkinter.font import Font
@@ -8,7 +9,6 @@ from tkinter import END
 from tkinter import RIDGE
 from tkinter import Toplevel
 from utils import *
-from utils import write_data
 
 # Global variables
 num_days = 0
@@ -46,6 +46,9 @@ def init_tb_payments(num_clients: int):
             data = f'Cliente {j+1}' if i == 0 else ""
             e = Entry(container4, relief=RIDGE)
             e.insert(END, data)
+            e.configure(validate="key", validatecommand=(
+                e.register(validate_float_input), "%P")
+            )
             container4.create_window(
                 (4+i*160, 50+j*20), window=e, anchor="nw")
             filas.append(e)
@@ -126,12 +129,69 @@ def disable_button():
         boton_solve.config(state="disabled")
 
 
+def create_table(ganancia, producion, num_clientes, num_dias):
+
+    window = tk.Toplevel(root)
+    window.title("resultados")
+
+    columns = ["Clientes / Plantas"] + [f"Día {i+1}" for i in range(num_dias)]
+    columns.append("Producción Total (MW)")
+    table = ttk.Treeview(window, columns=columns)
+
+    for col in columns:
+        table.heading(col, text=col)
+
+    nuclear_totals = [0.0] * num_dias
+    hydro_totals = [0.0] * num_dias
+    thermal_totals = [0.0] * num_dias
+
+    for i in range(num_clientes):
+        start = i * num_dias * 3
+        end = start + num_dias * 3
+
+        if end <= len(producion):  # Verifica que haya suficientes elementos en data
+            client_data = [producion[j:j+3] for j in range(start, end, 3)]
+            client_num = i + 1
+
+            # Formatear la lista de tuplas como cadenas
+            formatted_data = [str(tuple) for tuple in client_data]
+
+        # Calcular las sumas para las plantas
+            for j in range(num_dias):
+                nuclear_totals[j] += client_data[j][0]
+                hydro_totals[j] += client_data[j][1]
+                thermal_totals[j] += client_data[j][2]
+
+            table.insert("", "end", values=[
+                f"Cliente {client_num}"] + formatted_data)
+        else:
+            print(
+                f"No hay suficientes datos en 'data' para el cliente")
+
+    nuclear_totals.append(sum(nuclear_totals))
+    hydro_totals.append(sum(hydro_totals))
+    thermal_totals.append(sum(thermal_totals))
+
+    # Insertar filas para las sumas de plantas
+    table.insert("", "end", values=["Nuclear"] +
+                 [f"{total:.1f}" for total in nuclear_totals])
+    table.insert("", "end", values=[
+                 "Hidroeléctrica"] + [f"{total:.1f}" for total in hydro_totals])
+    table.insert("", "end", values=["Térmica"] +
+                 [f"{total:.1f}" for total in thermal_totals])
+
+    # Insertar la fila de Ganancia Total
+    table.insert("", "end", values=["Ganancia Total", ganancia])
+
+    table.pack()
+
+
 def clickStart():
     global num_clients, num_days, g
     try:
         num_clients = int(input_clients.get(), 10)
         num_days = int(input_days.get(), 10)
-        g = int(input_g.get(), 10)
+        g = float(input_g.get())
         # Agregar entradas a container4
         init_tb_payments(num_clients)
         init_tb_demanda(num_clients, num_days)
@@ -142,9 +202,11 @@ def clickStart():
 
 
 def clickSolve():
-    print("g:", g)
-    print("num_clients:", num_clients)
-    print("num_days:", num_days)
+    global num_clients, num_days, g
+
+    num_clients = int(input_clients.get(), 10)
+    num_days = int(input_days.get(), 10)
+    g = float(input_g.get())
     capacidad_values = []
     costo_values = []
     demanda_values = []
@@ -155,28 +217,27 @@ def clickSolve():
             lista = demanda[0][i]
             temp = []
             for j in range(len(lista)):
-                temp.append(int(lista[j].get(), 10))
+                temp.append(float(lista[j].get()))
             demanda_values.append(temp)
 
         demanda_values = [list(x) for x in zip(*demanda_values)]
 
         for i in range(len(pago[0][1])):
             value = pago[0][1][i].get()
-            pago_values.append(int(value, 10))
+            pago_values.append(float(value))
 
         for i in range(len(capacidad[0])):
             value = capacidad[0][i][0].get()
-            capacidad_values.append(int(value, 10))
+            capacidad_values.append(float(value))
             value = capacidad[0][i][1].get()
-            costo_values.append(int(value, 10))
+            costo_values.append(float(value))
 
-        print("pago:", pago_values)
-        print("capacidad:", capacidad_values)
-        print("costo:", costo_values)
-        print("demanda:", demanda_values)
+        data = solve(g, num_clients, num_days, costo_values,
+                     capacidad_values, pago_values, demanda_values)
+        ganancia = data[0]
+        producion = data[1]
 
-        print(solve(g, num_clients, num_days, costo_values,
-              capacidad_values, pago_values, demanda_values))
+        create_table(ganancia, producion, num_clients, num_days)
 
     except ValueError:
         t = Toplevel(root)
@@ -203,9 +264,9 @@ root = tk.Tk()
 root.title("Plantas de Energı́a")
 
 # Setup rows and columns for distribution
-root.grid_rowconfigure(0, weight=2)
-root.grid_rowconfigure(1, weight=14)
-root.grid_rowconfigure(2, weight=39)
+root.grid_rowconfigure(0, weight=1)
+root.grid_rowconfigure(1, weight=19)
+root.grid_rowconfigure(2, weight=35)
 root.grid_rowconfigure(3, weight=45)  # container6
 root.grid_columnconfigure(0, weight=50)
 root.grid_columnconfigure(1, weight=50)
@@ -213,7 +274,6 @@ root.grid_columnconfigure(1, weight=50)
 # Create containers
 container1 = tk.Frame(root)
 container2 = tk.Frame(root)
-container3 = tk.Frame(root)
 
 container4 = tk.Canvas(root)
 scrollbar4_y = Scrollbar(container4, orient="vertical")
@@ -239,7 +299,6 @@ scrollbar6_x.config(command=container6.xview)
 
 container1.grid(row=0, column=0, columnspan=2, sticky="nsew")
 container2.grid(row=1, column=0, sticky="nsew")
-container3.grid(row=1, column=1, sticky="nsew")
 
 container4.grid(row=2, column=0, sticky="nsew")
 scrollbar4_y.pack(side="right", fill="y")
@@ -282,7 +341,7 @@ input_days.configure(validate="key", validatecommand=(
 input_g = Entry(container2, width=10)
 input_g.place(x=230, y=50)
 input_g.configure(validate="key", validatecommand=(
-    input_g.register(validate_int_input), "%P"))
+    input_g.register(validate_float_input), "%P"))
 
 boton_cargar = Button(
     container2, text="Iniciar carga de datos", command=clickStart, width=25)
@@ -291,11 +350,6 @@ boton_cargar.place(x=50, y=80)
 boton_solve = Button(
     container2, text="Calcular", command=clickSolve, width=20, state="disabled")
 boton_solve.place(x=400, y=30)
-
-# container3
-content3 = tk.Label(container3, text="Contenedor 3")
-content3.pack()
-
 
 # Set scrollregion to update scrollbars
 container4.update_idletasks()
