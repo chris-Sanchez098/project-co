@@ -14,24 +14,16 @@ def validate_int_input(P):
         return False
 
 
-def write_data(G, num_clientes, num_dias, costo, capacidad, pagoCliente, nueva_demanda, file_name=data_path):
+def write_data(G, num_clientes, num_dias, costo, capacidad, pago, nueva_demanda, file_name=data_path):
     with open(file_name, 'w') as file:
-        file.write("% Porcentaje mínimo de demanda a satisfacer\n")
         file.write(f"G = {G};\n")
-        file.write("% costo por MW producido en cada planta\n")
-        file.write(f"costo={costo};\n")
-        file.write("% Capacidad diaria de las centrales (en MW)\n")
-        file.write(f"capacidad={capacidad};\n")
-        file.write("% Número de clientes\n")
-        file.write(f"num_clientes={num_clientes};\n")
-        file.write("% Número de días\n")
-        file.write(f"num_dias={num_dias};\n")
-        file.write("% número de plantas\n")
-        file.write(f"plantas={len(costo)};\n")
-        file.write("% Pago por MW de cada cliente\n")
-        file.write(f"pagoCliente={pagoCliente};\n")
-        file.write("% Demanda\n")
-        file.write("demanda=[")
+        file.write(f"costo = {costo};\n")
+        file.write(f"capacidad = {capacidad};\n")
+        file.write(f"num_clientes = {num_clientes};\n")
+        file.write(f"num_dias = {num_dias};\n")
+        file.write(f"num_plantas = {3};\n")
+        file.write(f"pago = {pago};\n")
+        file.write("demanda = [")
         for fila in nueva_demanda:
             file.write("|")
             file.write(", ".join(map(str, fila)))
@@ -64,6 +56,9 @@ def solve(G, num_clientes, num_dias, costo, capacidad, pagoCliente, nueva_demand
         f'minizinc --solver COIN-BC {model_path} {data_path}').read()
     return result
 
+
+print(solve(G, num_clientes, num_dias, costo, capacidad,
+      pagoCliente, nueva_demanda, data_path))
 
 # write_data(G, num_clientes, num_dias,
 #            costo, capacidad, pagoCliente, nueva_demanda)

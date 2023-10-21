@@ -1,29 +1,30 @@
-int: num_clientes;
-int: num_dias;
-int: plantas;
-float: G;
-
-array[1..num_clientes] of float: pagoCliente;
-array[1..plantas] of float: costo;
-array[1..plantas] of float: capacidad;
+% Parámetros
+int: num_clientes; % Número de clientes
+int: num_dias; % Número de días
+int: num_plantas; % Número de plantas
+int: G; % Porcentaje mínimo de demanda a satisfacer
+array[1..num_plantas] of float: costo;  % Costo por MW producido en cada planta
+array[1..num_plantas] of float: capacidad;  % Capacidad diaria en cada planta (en MW)
+array[1..num_clientes] of float: pago;% Pago por MW de cada cliente
 array[1..num_clientes, 1..num_dias] of float: demanda;
 
-
 % Variables de decisión
-array[1..num_clientes, 1..num_dias, 1..plantas] of var float: produccion;  % Producción de energía por planta
+array[1..num_clientes, 1..num_dias, 1..num_plantas] of var int: produccion;  % Producción de energía por planta
     
-constraint forall(d in 1..num_dias, p in 1..plantas) (
+% Restricciones
+constraint forall(d in 1..num_dias, p in 1..num_plantas) (
     sum(c in 1..num_clientes) (produccion[c,d,p]) <= capacidad[p]
 );
 
 constraint forall(d in 1..num_dias, c in 1..num_clientes) (
-    sum(p in 1..plantas) (produccion[c,d,p]) >= demanda[c,d]*0.5 
+    sum(p in 1..num_plantas) (produccion[c,d,p]) >= demanda[c,d]*0.5 
 );
+
+% Función Objectivo
 
 var float: ganancia_neta = sum(d in 1..num_dias, c in 1..num_clientes) (
-    sum(p in 1..plantas) (produccion[c,d,p] * pagoCliente[c]) - sum(p in 1..plantas) (produccion[c,d,p]*costo[p])
+    sum(p in 1..num_plantas) (produccion[c,d,p] * pago[c]) - sum(p in 1..num_plantas) (produccion[c,d,p]*costo[p])
 );
-
 
 solve maximize ganancia_neta;
 
