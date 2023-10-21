@@ -45,7 +45,7 @@ def solve(G, num_clientes, num_dias, costo, capacidad, pago, nueva_demanda, file
     write_data(G, num_clientes, num_dias, costo, capacidad,
                pago, nueva_demanda, file_name)
     result = os.popen(
-        f'minizinc --solver COIN-BC {model_path} {data_path}').read()
+        f'minizinc --solver HiGHS {model_path} {data_path}').read()
 
     if result != "UNSATISFIABLE\n":
         r = result.split('&')

@@ -22,6 +22,10 @@ constraint forall(d in 1..num_dias, p in 1..num_plantas, c in 1..num_clientes) (
 );
 
 constraint forall(d in 1..num_dias, c in 1..num_clientes) (
+    sum(p in 1..num_plantas) (produccion[c,d,p]) <= demanda[c, d]
+);
+
+constraint forall(d in 1..num_dias, c in 1..num_clientes) (
     sum(p in 1..num_plantas) (produccion[c,d,p]) >= demanda[c,d]*(G/100)
 );
 
